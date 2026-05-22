@@ -19,7 +19,62 @@
 
                         <div class="mb-4">
                             <label class="block text-sm font-bold text-gray-700">Lokasi / Cawangan Diaudit</label>
-                            <input type="text" name="bahagian_cawangan" value="{{ $borang->bahagian_cawangan }}" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm" required>
+                            
+                            @php
+                                $senaraiLokasi = [
+                                    'JTDI Wilayah' => [
+                                        'Cawangan Bandaraya (Ibu Pejabat)',
+                                        'Wilayah Pantai Barat Utara',
+                                        'Wilayah Pedalaman Atas',
+                                        'Wilayah Pedalaman Bawah',
+                                        'Wilayah Sandakan',
+                                        'Wilayah Tawau'
+                                    ],
+                                    'Pasukan Inovasi Digital (PID)' => [
+                                        'PID Kementerian Kewangan (MOF)',
+                                        'PID Kementerian Pembangunan Luar Bandar (KPLB)',
+                                        'PID Kementerian Kerajaan Tempatan dan Perumahan (KKTP)',
+                                        'PID Kementerian Kerja Raya (KKR)',
+                                        'PID Kementerian Pertanian, Perikanan dan Industri Makanan',
+                                        'PID Kementerian Sains, Teknologi dan Inovasi (KSTI)',
+                                        'PID Kementerian Pelancongan, Kebudayaan dan Alam Sekitar',
+                                        'PID Kementerian Belia dan Sukan (KBS)',
+                                        'PID Kementerian Pembangunan Perindustrian dan Keusahawanan',
+                                        'PID Kementerian Pembangunan Masyarakat dan Kesejahteraan Rakyat',
+                                        'PID Jabatan Ketua Menteri (JKM)',
+                                        'PID Dewan Bandaraya Kota Kinabalu (DBKK)',
+                                        'PID Jabatan Air Negeri Sabah (JANS)',
+                                        'PID Jabatan Kerja Raya (JKR)',
+                                        'PID Jabatan Tanah dan Ukur (JTU)',
+                                        'PID Jabatan Hal Ehwal Agama Islam Negeri Sabah (JHEAINS)',
+                                        'PID Jabatan Perhutanan Sabah',
+                                        'PID Jabatan Perkhidmatan Veterinar',
+                                        'PID Jabatan Perancang Bandar dan Wilayah',
+                                        'PID Pejabat Hasil Bumi',
+                                        'PID Lembaga Industri Getah Sabah (LIGS)'
+                                    ],
+                                    'Unit Sokongan ICT (USIT)' => [
+                                        'USIT Jabatan Pembangunan Perindustrian & Penyelidikan',
+                                        'USIT Jabatan Pembangunan Sumber Manusia (JPSM)',
+                                        'USIT Jabatan Pertanian Sabah',
+                                        'USIT Jabatan Perikanan Sabah',
+                                        'USIT Pejabat Daerah'
+                                    ]
+                                ];
+                            @endphp
+
+                            <select name="bahagian_cawangan" class="mt-1 block w-full border-gray-300 focus:border-red-700 focus:ring-red-700 rounded-md shadow-sm" required>
+                                <option value="" disabled>-- Pilih Lokasi Audit --</option>
+                                @foreach($senaraiLokasi as $kategori => $cawangan)
+                                    <optgroup label="=== {{ $kategori }} ===" class="bg-gray-100 font-bold text-red-900">
+                                        @foreach($cawangan as $lokasi)
+                                            <option value="{{ $lokasi }}" class="bg-white text-gray-800 font-normal" {{ $borang->bahagian_cawangan == $lokasi ? 'selected' : '' }}>
+                                                {{ $lokasi }}
+                                            </option>
+                                        @endforeach
+                                    </optgroup>
+                                @endforeach
+                            </select>
                         </div>
 
                         <div class="mb-4">
