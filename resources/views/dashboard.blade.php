@@ -24,18 +24,30 @@
                                 <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h7"></path></svg>
                                 Menu
                             </div>
+
+                            @php
+                                    $menungguSemakan = \App\Models\BorangAudit::where('ketua_juruaudit_id', Auth::id())
+                                                                ->where('status', 'siap_disemak')
+                                                                ->count();
+                                @endphp
+
                             <div class="p-2 space-y-1">
-                                <a href="#sesi-audit" class="block px-4 py-3 text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-800 rounded-md transition font-semibold">
-                                    Sesi Audit (Dirancang & Sedang Berjalan)
+                                <a href="#sesi-audit" class="flex justify-between items-center px-4 py-3 text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-800 rounded-md transition font-semibold">
+                                    <span>Sesi Audit</span>
+                                    @if($menungguSemakan > 0)
+                                        <span class="bg-red-500 text-white text-[10px] font-bold px-2 py-0.5 rounded-full shadow-sm animate-pulse">
+                                            {{ $menungguSemakan }}
+                                        </span>
+                                    @endif
                                 </a>
-                                
+
                                 @php
                                     $tugasKetuaBerjalan = \App\Models\BorangAudit::where('juruaudit_ditugaskan_id', Auth::id())
                                                                 ->where('status', '!=', 'selesai')
                                                                 ->count();
                                 @endphp
                                 
-                                <a href="#tugasan-kendiri" class="flex justify-between items-center px-4 py-3 text-sm text-gray-700 hover:bg-green-50 hover:text-green-800 rounded-md transition font-semibold">
+                                <a href="#tugasan-kendiri" class="flex justify-between items-center px-4 py-3 text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-800 rounded-md transition font-semibold">
                                     <span>Peti Masuk Tugasan</span>
                                     
                                     @if($tugasKetuaBerjalan > 0)
@@ -107,8 +119,8 @@
                         </div>
 
                         <div id="sesi-audit" class="scroll-mt-6 bg-white overflow-hidden shadow-sm sm:rounded-lg border border-gray-200">
-                            <div class="p-6 text-gray-900 bg-gray-50 border-b flex justify-between items-center">
-                                <h4 class="font-bold text-gray-800">Sesi Audit (Dirancang & Sedang Berjalan)</h4>
+                            <div class="p-6 text-gray-900 bg-[#003366] border-b flex justify-between items-center">
+                                <h4 class="font-bold text-white text-[16px] uppercase">Sesi Audit</h4>
                             </div>
                             
                             <div class="p-0">
@@ -118,7 +130,7 @@
                                             <thead class="bg-gray-100">
                                                 <tr>
                                                     <th scope="col" class="px-6 py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-widest w-1/4">Maklumat Sesi</th>
-                                                    <th scope="col" class="px-14 py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-widest w-1/4">Status Sesi</th>
+                                                    <th scope="col" class="px-6 py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-widest w-1/4">Status Sesi</th>
                                                     <th scope="col" class="px-6 py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-widest w-1/2">Pemantauan Pasukan</th>
                                                 </tr>
                                             </thead>
@@ -131,7 +143,7 @@
                                                             {{ \Carbon\Carbon::parse($sesi->tarikh_mula)->format('d/m/Y') }} - {{ \Carbon\Carbon::parse($sesi->tarikh_tamat)->format('d/m/Y') }}
                                                         </div>
                                                     </td>
-                                                    <td class="px-8 py-5 whitespace-nowrap align-top">
+                                                    <td class="px-6 py-5 whitespace-nowrap align-top">
                                                         @if($sesi->status == 'dirancang')
                                                             <span class="px-3 py-1 inline-flex text-[12px] font-bold uppercase rounded-full bg-gray-100 text-gray-800 border border-gray-200">Dirancang</span>
                                                         @elseif($sesi->status == 'siap')
@@ -153,7 +165,11 @@
                                                                             📍 {{ $borang->bahagian_cawangan ?? 'Lokasi Tidak Dinyatakan' }}
                                                                         </span>
 
-                                                                        <span class="text-[12px] uppercase font-bold px-3 py-1 mt-1.5 inline-block rounded {{ $borang->status == 'selesai' ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-600' }}">
+                                                                        <span class="text-[12px] uppercase font-bold px-3 py-1 mt-2 inline-block rounded shadow-sm
+                                                                            {{ $borang->status == 'ditugaskan' ? 'bg-gray-100 gray-700 border border-gray-200' : 
+                                                                              ($borang->status == 'sedang_diisi' ? 'bg-yellow-100 text-yellow-700 border border-yellow-200' : 
+                                                                              ($borang->status == 'siap_disemak' ? 'bg-red-100 text-red-700 border border-red-200 animate-pulse' : 
+                                                                              'bg-green-100 text-green-700 border border-green-200')) }}">
                                                                             {{ str_replace('_', ' ', $borang->status) }}
                                                                         </span>
                                                                     </div>
@@ -186,8 +202,8 @@
 
                         @if(isset($senaraiTugasan) && $senaraiTugasan->count() > 0)
                         <div id="tugasan-kendiri" class="scroll-mt-6 bg-white overflow-hidden shadow-sm sm:rounded-lg border border-gray-200">
-                            <div class="p-4 bg-green-50 border-b border-green-100 flex justify-between items-center">
-                                <h4 class="font-bold text-green-800">Peti Masuk Tugasan Audit</h4>
+                            <div class="p-6 bg-[#003366] border-b border-green-100 flex justify-between items-center">
+                                <h4 class="font-bold text-white uppercase text-[16px]">Peti Masuk Tugasan Audit</h4>
                             </div>
                             <div class="p-0">
                                 <div class="overflow-x-auto">
@@ -196,8 +212,8 @@
                                             <tr>
                                                 <th class="px-5 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wide">Tarikh</th>
                                                 <th class="px-5 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wide">Tajuk Sesi</th>
-                                                <th class="px-10 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wide">Cawangan Diaudit</th>
-                                                <th class="px-10 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wide">Status</th>
+                                                <th class="px-5 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wide">Cawangan Diaudit</th>
+                                                <th class="px-5 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wide">Status</th>
                                                 <th class="px-8 py-3 text-right text-xs font-semibold text-gray-600 uppercase tracking-wide">Tindakan</th>
                                             </tr>
                                         </thead>
@@ -265,12 +281,19 @@
                                 <a href="#analitik-juruaudit" class="block px-4 py-3 text-sm text-gray-700 hover:bg-green-50 hover:text-green-800 rounded-md transition font-semibold">
                                     Statistik Kendiri
                                 </a>
+
+                                @php
+                                    $tugasanBaru = \App\Models\BorangAudit::where('juruaudit_ditugaskan_id', Auth::id())
+                                                                ->where('status', 'ditugaskan')
+                                                                ->count();
+                                @endphp
+
                                 <a href="#tugasan-borang" class="flex justify-between items-center px-4 py-3 text-sm text-gray-700 hover:bg-green-50 hover:text-green-800 rounded-md transition font-semibold">
                                     <span>Peti Masuk Tugasan Borang</span>
                                     
-                                    @if($statistik['jumlah_berjalan'] > 0)
+                                    @if($tugasanBaru > 0)
                                         <span class="bg-red-500 text-white text-[10px] font-bold px-2 py-0.5 rounded-full shadow-sm animate-pulse">
-                                            {{ $statistik['jumlah_berjalan'] }}
+                                            {{ $tugasanBaru }}
                                         </span>
                                     @endif
                                 </a>
@@ -320,8 +343,8 @@
                         </div>
 
                         <div id="tugasan-borang" class="scroll-mt-6 bg-white overflow-hidden shadow-sm sm:rounded-lg border border-gray-200">
-                            <div class="p-4 bg-gray-50 border-b flex justify-between items-center">
-                                <h4 class="font-bold text-gray-800">Peti Masuk Tugasan Borang Audit</h4>
+                            <div class="p-6 bg-green-600 border-b flex justify-between items-center">
+                                <h4 class="font-bold text-white uppercase text-[16px]">Peti Masuk Tugasan Borang Audit</h4>
                             </div>
                             <div class="p-0">
                                 @if($senaraiTugasan->count() > 0)
@@ -354,14 +377,13 @@
                                                 </td>
 
                                                 <td class="px-5 py-3">
-                                                    <span class="inline-flex items-center px-2.5 py-0.5 text-[12px] font-semibold rounded-full
-                                                        {{ $tugasan->status == 'ditugaskan' 
-                                                            ? 'bg-red-100 text-red-700 animate-pulse' 
-                                                            : ($tugasan->status == 'sedang_diisi' 
-                                                                ? 'bg-yellow-100 text-yellow-700' 
-                                                                : 'bg-green-100 text-green-700') }}">
-                                                        {{ strtoupper(str_replace('_', ' ', $tugasan->status)) }}
-                                                    </span>
+                                                        <span class="px-3 py-1.5 inline-flex text-[12px] uppercase font-bold rounded-full border shadow-sm
+                                                            {{ $tugasan->status == 'ditugaskan' ? 'bg-red-100 text-red-700 border-red-200 animate-pulse' : 
+                                                              ($tugasan->status == 'sedang_diisi' ? 'bg-yellow-100 text-yellow-700 border-yellow-200' : 
+                                                              ($tugasan->status == 'siap_disemak' ? 'bg-gray-100 text-gray-700 border-gray-200' : 
+                                                              'bg-green-100 text-green-700 border-green-200')) }}">
+                                                            {{ str_replace('_', ' ', $tugasan->status) }}
+                                                        </span>
                                                 </td>
 
                                                 <td class="px-1 py-3 text-right">

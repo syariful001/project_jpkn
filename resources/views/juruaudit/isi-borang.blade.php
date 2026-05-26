@@ -63,7 +63,7 @@
                             <input type="text" name="nama_auditee" id="nama_auditee" 
                                 value="{{ old('nama_auditee', $borang->nama_auditee) }}" 
                                 class="mt-1 block w-full border-gray-300 focus:border-green-600 focus:ring-green-600 rounded-md shadow-sm font-bold" 
-                                autocomplete="off" required>
+                                autocomplete="off" required style="text-transform: uppercase;">
                         </div>
                     </div>
                 </div>
@@ -71,7 +71,7 @@
                 <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg mb-6 border border-blue-200">
                     <div class="p-4 bg-blue-50 border-b border-blue-200">
                         <h3 class="text-lg font-bold text-blue-900">Langkah 1: Pilih Klausa Berkaitan</h3>
-                        <p class="text-xs text-gray-600">Tekan butang [+] untuk melihat sub-klausa. Tandakan kotak (checkbox) pada klausa yang ingin diaudit.</p>
+                        <p class="text-xs text-gray-600">Tekan butang [+] untuk melihat sub-klausa. Tandakan kotak pada klausa utama untuk automatik memilih semua sub-klausanya.</p>
                     </div>
                     
                     <div class="p-6">
@@ -125,8 +125,8 @@
                 </div>
 
                 <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg mb-6">
-                    <div class="p-4 bg-gray-50 border-b border-gray-200">
-                        <h3 class="text-lg font-bold text-gray-800">Langkah 2: Pengisian Borang Semakan</h3>
+                    <div class="p-4 bg-blue-50 border-b border-gray-200">
+                        <h3 class="text-lg font-bold text-blue-900">Langkah 2: Pengisian Borang Semakan</h3>
                     </div>
                     
                     <div class="p-6">
@@ -136,48 +136,56 @@
 
                         <div id="table-body" class="space-y-6">
                             @foreach($senaraiItem as $item)
-                            <div id="row-{{ $item->id }}" class="klausa-row hidden bg-white shadow-md rounded-lg border border-gray-200 overflow-hidden">
-                                
-                                <div class="bg-gray-800 p-4 flex justify-between items-center cursor-pointer hover:bg-gray-700 transition" onclick="window.toggleCard('{{ $item->id }}')">
-                                    <div class="flex items-center space-x-4">
-                                        <span class="bg-white text-gray-800 px-3 py-1 rounded text-sm font-bold">Klausa {{ $item->no_klausa }}</span>
-                                        <span class="text-white font-bold text-base truncate max-w-md">{{ $item->templatKlausa->tajuk_klausa ?? 'Perkara Semakan' }}</span>
-                                    </div>
-                                    <div class="flex items-center">
-                                        <button type="button" class="text-white text-xs font-bold uppercase tracking-widest flex items-center bg-gray-600 px-3 py-1.5 rounded hover:bg-gray-500">
-                                            <span id="btn-text-{{ $item->id }}">Tutup</span>
-                                            <svg id="icon-{{ $item->id }}" class="w-4 h-4 ml-2 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7"></path></svg>
-                                        </button>
-                                    </div>
-                                </div>
+                                @php
+                                    // Logik Halang Borang: Jika tiada deskripsi, jangan cipta kotak borang ini
+                                    $deskripsiItem = trim($item->templatKlausa->deskripsi ?? '-');
+                                    $bolehDipilih = ($deskripsiItem !== '' && $deskripsiItem !== '-');
+                                @endphp
 
-                                <div id="card-body-{{ $item->id }}" class="p-6 bg-gray-50">
+                                @if($bolehDipilih)
+                                <div id="row-{{ $item->id }}" class="klausa-row hidden bg-white shadow-md rounded-lg border border-gray-200 overflow-hidden">
                                     
-                                    <div class="bg-white border border-gray-300 p-6 mb-6 text-justify text-gray-600 rounded-md shadow-inner min-h-[80px] flex items-center justify-center text-sm">
-                                        {{ $item->templatKlausa->deskripsi ?? 'Tiada deskripsi khusus diletakkan untuk klausa ini.' }}
+                                    <div class="bg-gray-800 p-4 flex justify-between items-center cursor-pointer hover:bg-gray-700 transition" onclick="window.toggleCard('{{ $item->id }}')">
+                                        <div class="flex items-center space-x-4">
+                                            <span class="bg-white text-gray-800 px-3 py-1 rounded text-sm font-bold">Klausa {{ $item->no_klausa }}</span>
+                                            <span class="text-white font-bold text-base truncate max-w-md">{{ $item->templatKlausa->tajuk_klausa ?? 'Perkara Semakan' }}</span>
+                                        </div>
+                                        <div class="flex items-center">
+                                            <button type="button" class="text-white text-xs font-bold uppercase tracking-widest flex items-center bg-gray-600 px-3 py-1.5 rounded hover:bg-gray-500">
+                                                <span id="btn-text-{{ $item->id }}">Tutup</span>
+                                                <svg id="icon-{{ $item->id }}" class="w-4 h-4 ml-2 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7"></path></svg>
+                                            </button>
+                                        </div>
                                     </div>
 
-                                    <textarea name="perkara_periksa[{{ $item->id }}]" id="hidden-perkara-{{ $item->id }}" class="hidden">{{ old('perkara_periksa.'.$item->id, $item->ulasan ? $item->perkara_periksa : '') }}</textarea>
-                                    <textarea name="ulasan[{{ $item->id }}]" id="hidden-ulasan-{{ $item->id }}" class="hidden">{{ old('ulasan.'.$item->id, $item->ulasan) }}</textarea>
+                                    <div id="card-body-{{ $item->id }}" class="p-6 bg-gray-50">
+                                        
+                                        <div class="bg-white border border-gray-300 p-6 mb-6 text-justify text-gray-600 rounded-md shadow-inner min-h-[80px] flex items-center justify-center text-sm">
+                                            {{ $item->templatKlausa->deskripsi ?? 'Tiada deskripsi khusus diletakkan untuk klausa ini.' }}
+                                        </div>
 
-                                    <div id="dynamic-container-{{ $item->id }}" class="space-y-4"></div>
+                                        <textarea name="perkara_periksa[{{ $item->id }}]" id="hidden-perkara-{{ $item->id }}" class="hidden">{{ old('perkara_periksa.'.$item->id, $item->ulasan ? $item->perkara_periksa : '') }}</textarea>
+                                        <textarea name="ulasan[{{ $item->id }}]" id="hidden-ulasan-{{ $item->id }}" class="hidden">{{ old('ulasan.'.$item->id, $item->ulasan) }}</textarea>
 
-                                    <div class="flex justify-end mt-4 mb-8">
-                                        <button type="button" onclick="window.addRow('{{ $item->id }}')" class="bg-gray-800 text-white text-xs font-bold px-5 py-2.5 rounded shadow hover:bg-black transition uppercase tracking-wider">
-                                            + Tambah
-                                        </button>
+                                        <div id="dynamic-container-{{ $item->id }}" class="space-y-4"></div>
+
+                                        <div class="flex justify-end mt-4 mb-8">
+                                            <button type="button" onclick="window.addRow('{{ $item->id }}')" class="bg-gray-800 text-white text-xs font-bold px-5 py-2.5 rounded shadow hover:bg-black transition uppercase tracking-wider">
+                                                + Tambah
+                                            </button>
+                                        </div>
+
+                                        <div class="mt-6 border-t border-gray-200 pt-5">
+                                            <label class="block text-sm font-bold text-blue-900 uppercase mb-2">Rujukan (Jika ada)</label>
+                                            <input type="text" name="rujukan[{{ $item->id }}]" id="input-rujukan-{{ $item->id }}" 
+                                                class="w-full md:w-1/3 text-sm border-gray-300 focus:border-green-600 focus:ring-green-600 rounded shadow-sm item-input-{{ $item->id }}" 
+                                                value="{{ old('rujukan.'.$item->id, $item->rujukan) }}" 
+                                                autocomplete="off" disabled>
+                                        </div>
                                     </div>
 
-                                    <div class="mt-6 border-t border-gray-200 pt-5">
-                                        <label class="block text-sm font-bold text-blue-900 uppercase mb-2">Rujukan (Jika ada)</label>
-                                        <input type="text" name="rujukan[{{ $item->id }}]" id="input-rujukan-{{ $item->id }}" 
-                                            class="w-full md:w-1/3 text-sm border-gray-300 focus:border-green-600 focus:ring-green-600 rounded shadow-sm item-input-{{ $item->id }}" 
-                                            value="{{ old('rujukan.'.$item->id, $item->rujukan) }}" 
-                                            autocomplete="off" disabled>
-                                    </div>
                                 </div>
-
-                            </div>
+                                @endif
                             @endforeach
                         </div>
                     </div>
@@ -217,6 +225,8 @@
             const cb = document.querySelector(`.klausa-cb[data-id="${itemId}"]`);
             const isEnabled = cb ? cb.checked : false;
             const container = document.querySelector(`#dynamic-container-${itemId}`);
+
+            if(!container) return; // Abaikan jika kotak borang tiada (klausa tiada deskripsi)
 
             const rowDiv = document.createElement('div');
             rowDiv.className = 'bg-white p-5 border border-gray-200 rounded-md shadow-sm relative mb-4';
@@ -271,15 +281,21 @@
         window.syncHiddenFields = function(itemId) {
             const ps = Array.from(document.querySelectorAll(`.input-perkara-${itemId}`)).map(i => i.value);
             const us = Array.from(document.querySelectorAll(`.input-ulasan-${itemId}`)).map(i => i.value);
-            document.getElementById(`hidden-perkara-${itemId}`).value = ps.join('\n');
-            document.getElementById(`hidden-ulasan-${itemId}`).value = us.join('\n');
+            
+            const hiddenP = document.getElementById(`hidden-perkara-${itemId}`);
+            const hiddenU = document.getElementById(`hidden-ulasan-${itemId}`);
+            
+            if(hiddenP && hiddenU) {
+                hiddenP.value = ps.join('\n');
+                hiddenU.value = us.join('\n');
+            }
         }
 
         document.addEventListener('DOMContentLoaded', function() {
             
+            // Halang butang 'Enter' daripada menghantar borang
             window.addEventListener('keydown', function(e) {
                 if (e.key === 'Enter' || e.keyCode === 13) {
-                    // Benarkan 'Enter' hanya jika pengguna sedang fokus pada butang (Cth: Butang + Tambah)
                     if (e.target.tagName !== 'BUTTON') {
                         e.preventDefault();
                         return false;
@@ -290,10 +306,15 @@
             // Inisialisasi Data Sedia Ada
             document.querySelectorAll('.klausa-row').forEach(row => {
                 const itemId = row.getAttribute('id').replace('row-', '');
-                const ps = document.getElementById(`hidden-perkara-${itemId}`).value.split('\n');
-                const us = document.getElementById(`hidden-ulasan-${itemId}`).value.split('\n');
-                const count = Math.max(ps.length, us.length, 1);
-                for(let i=0; i<count; i++) window.addRow(itemId, ps[i] || '', us[i] || '');
+                const hiddenP = document.getElementById(`hidden-perkara-${itemId}`);
+                const hiddenU = document.getElementById(`hidden-ulasan-${itemId}`);
+                
+                if (hiddenP && hiddenU) {
+                    const ps = hiddenP.value.split('\n');
+                    const us = hiddenU.value.split('\n');
+                    const count = Math.max(ps.length, us.length, 1);
+                    for(let i=0; i<count; i++) window.addRow(itemId, ps[i] || '', us[i] || '');
+                }
             });
 
             // Logik Checkbox & Tree (Langkah 1)
@@ -308,6 +329,7 @@
                         row.querySelectorAll('input').forEach(i => i.disabled = !isChecked);
                     }
                     
+                    // Semak sub-klausa secara automatik
                     const klausa = this.getAttribute('data-klausa');
                     document.querySelectorAll(`.klausa-cb[data-klausa^="${klausa}."]`).forEach(sub => {
                         sub.checked = isChecked;

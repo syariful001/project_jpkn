@@ -105,8 +105,8 @@
                     </div>
 
                     <div id="pengurusan-sesi" class="scroll-mt-6 bg-white overflow-hidden shadow-sm sm:rounded-lg border border-gray-200">
-                        <div class="p-4 bg-gray-50 border-b flex justify-between items-center">
-                            <h3 class="text-md font-bold text-gray-800 uppercase tracking-widest">Pengurusan Sesi Audit</h3>
+                        <div class="p-6 bg-red-700 border-b flex justify-between items-center">
+                            <h3 class="text-[16px] font-bold text-white uppercase tracking-widest">Pengurusan Sesi Audit</h3>
                         </div>
                         <div class="p-0">
                             <div class="overflow-x-auto">
@@ -122,7 +122,7 @@
                                     <tbody class="bg-white divide-y divide-gray-200">
                                         @forelse($semuaSesi as $sesi)
                                         <tr class="hover:bg-gray-50 transition">
-                                            <td class="px-6 py-4 text-sm font-bold text-gray-900">{{ $sesi->tajuk_sesi }}</td>
+                                            <td class="px-6 py-4 text-sm font-bold text-gray-900 uppercase">{{ $sesi->tajuk_sesi }}</td>
                                             <td class="px-6 py-4 text-sm text-gray-500">
                                                 {{ \Carbon\Carbon::parse($sesi->tarikh_mula)->format('d/m/Y') }} - {{ \Carbon\Carbon::parse($sesi->tarikh_tamat)->format('d/m/Y') }}
                                             </td>
@@ -152,8 +152,8 @@
                     </div>
 
                     <div id="pengurusan-borang" class="scroll-mt-6 bg-white overflow-hidden shadow-sm sm:rounded-lg border border-gray-200">
-                        <div class="p-4 bg-gray-50 border-b flex justify-between items-center gap-4">
-                            <h3 class="text-md font-bold text-gray-800 uppercase tracking-widest">Pengurusan Borang Audit Lapangan</h3>
+                        <div class="p-6 bg-red-700 border-b flex justify-between items-center gap-4">
+                            <h3 class="text-[16px] font-bold text-white uppercase tracking-widest">Pengurusan Borang Audit Lapangan</h3>
                         </div>
                         <div class="p-0">
                             <div class="overflow-x-auto">
