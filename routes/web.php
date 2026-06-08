@@ -170,25 +170,3 @@ Route::prefix('admin')->group(function () {
     })->name('admin.logout');
     
 });
-
-// ==========================================
-// LALUAN UJIAN EKSTREM
-// ==========================================
-Route::get('/ujian-paksa-simpan/{id}', function($id) {
-    try {
-        $borang = \App\Models\BorangAudit::findOrFail($id);
-        $borang->ulasan_ketua = "INI ADALAH UJIAN PINTASAN SISTEM";
-        $borang->status = 'selesai';
-        $borang->save();
-
-        $sesi = \App\Models\SesiAudit::find($borang->sesi_audit_id);
-        if ($sesi) {
-            $sesi->status = 'selesai';
-            $sesi->save();
-        }
-
-        return "<h1>UJIAN BERJAYA!</h1> <p>Pangkalan data berfungsi dengan sempurna. Sila semak Dashboard Ketua sekarang.</p>";
-    } catch (\Exception $e) {
-        return "<h1>UJIAN GAGAL.</h1> <p>Ralat Pangkalan Data: " . $e->getMessage() . "</p>";
-    }
-});
