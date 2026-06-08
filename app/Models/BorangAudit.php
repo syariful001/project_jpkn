@@ -13,5 +13,10 @@ class BorangAudit extends Model
     {
         return $this->belongsTo(User::class, 'juruaudit_ditugaskan_id');
     }
+
+    public function juruauditDitugaskan()
+    {
+        return $this->belongsTo(User::class, 'juruaudit_ditugaskan_id');
+    }
 }
 

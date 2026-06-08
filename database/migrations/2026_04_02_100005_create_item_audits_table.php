@@ -25,6 +25,10 @@ return new class extends Migration
         $table->text('ulasan')->nullable();
         $table->string('url_bukti')->nullable(); // Untuk simpan nama fail gambar/pdf
         $table->timestamps();
+        $table->integer('ncr_count')->default(0);
+        $table->integer('ofi_count')->default(0);
+        $table->text('ncr_details')->nullable();
+        $table->text('ofi_details')->nullable();
     });
 }
 

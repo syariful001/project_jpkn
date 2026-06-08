@@ -131,7 +131,7 @@
                                                 <tr>
                                                     <th scope="col" class="px-6 py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-widest w-1/4">Maklumat Sesi</th>
                                                     <th scope="col" class="px-6 py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-widest w-1/4">Status Sesi</th>
-                                                    <th scope="col" class="px-6 py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-widest w-1/2">Pemantauan Pasukan</th>
+                                                    <th scope="col" class="px-6 py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-widest w-1/2">Pemantauan Pasukan Audit</th>
                                                 </tr>
                                             </thead>
                                             <tbody class="bg-white divide-y divide-gray-200">
@@ -235,12 +235,13 @@
                                                 </td>
 
                                                 <td class="px-5 py-3">
-                                                    <span class="inline-flex items-center px-3 py-1 text-xs font-semibold rounded-full
-                                                        {{ $tugasan->status == 'selesai' 
-                                                            ? 'bg-green-100 text-green-700' 
-                                                            : 'bg-red-100 text-red-700 animate-pulse'}}">
-                                                        {{ strtoupper(str_replace('_', ' ', $tugasan->status)) }}
-                                                    </span>
+                                                        <span class="px-3 py-1.5 inline-flex text-[12px] uppercase font-bold rounded-full border shadow-sm
+                                                            {{ $tugasan->status == 'ditugaskan' ? 'bg-red-100 text-red-700 border-red-200 animate-pulse' : 
+                                                              ($tugasan->status == 'sedang_diisi' ? 'bg-yellow-100 text-yellow-700 border-yellow-200' : 
+                                                              ($tugasan->status == 'siap_disemak' ? 'bg-gray-100 text-gray-700 border-gray-200' : 
+                                                              'bg-green-100 text-green-700 border-green-200')) }}">
+                                                            {{ str_replace('_', ' ', $tugasan->status) }}
+                                                        </span>
                                                 </td>
 
                                                 <td class="px-5 py-3 text-right">
@@ -416,4 +417,25 @@
             @endif
         </div>
     </div>
+    <button id="scrollToTopBtn" onclick="window.scrollTo({ top: 0, behavior: 'smooth' });"
+        class="fixed bottom-8 right-8 bg-[#003366] text-white p-3 rounded-full shadow-lg hover:bg-blue-900 transition-all duration-300 opacity-0 invisible z-50 transform hover:scale-110">
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 10l7-7m0 0l7 7m-7-7v18"></path>
+        </svg>
+    </button>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const scrollBtn = document.getElementById('scrollToTopBtn');
+            window.addEventListener('scroll', function() {
+                if (window.scrollY > 300) {
+                    scrollBtn.classList.remove('opacity-0', 'invisible');
+                    scrollBtn.classList.add('opacity-100', 'visible');
+                } else {
+                    scrollBtn.classList.remove('opacity-100', 'visible');
+                    scrollBtn.classList.add('opacity-0', 'invisible');
+                }
+            });
+        });
+    </script>
 </x-app-layout>

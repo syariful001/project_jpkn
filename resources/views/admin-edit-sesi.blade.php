@@ -33,7 +33,7 @@
                             <label class="block text-sm font-bold text-gray-700">Status Sesi</label>
                             <select name="status" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm">
                                 <option value="dirancang" {{ $sesi->status == 'dirancang' ? 'selected' : '' }}>Dirancang</option>
-                                <option value="siap" {{ $sesi->status == 'siap' ? 'selected' : '' }}>Sedang Berjalan / Semakan</option>
+                                <option value="sedang berjalan" {{ $sesi->status == 'siap' ? 'selected' : '' }}>Sedang Berjalan / Semakan</option>
                                 <option value="selesai" {{ $sesi->status == 'selesai' ? 'selected' : '' }}>Selesai</option>
                             </select>
                         </div>

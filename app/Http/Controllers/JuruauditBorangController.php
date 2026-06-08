@@ -55,7 +55,7 @@ class JuruauditBorangController extends Controller
             $sesi->save();
         }
 
-// 4. Proses dan simpan input teks klausa
+        // 4. Proses dan simpan input teks klausa
         $items = ItemAudit::where('borang_audit_id', $borang->id)->get();
 
         foreach ($items as $item) {
@@ -63,20 +63,35 @@ class JuruauditBorangController extends Controller
             // Jadi, kita hanya memproses item yang wujud di dalam $request->ulasan.
             if (isset($request->ulasan[$item->id])) {
                 
-                // Simpan teks dari textarea
+                // Simpan teks dari textarea asas
                 $item->perkara_periksa = $request->perkara_periksa[$item->id] ?? $item->perkara_periksa;
                 $item->ulasan = $request->ulasan[$item->id];
                 $item->rujukan = $request->rujukan[$item->id] ?? null;
 
-                // UBAH DI SINI: Kita hantar 'Ya' sahaja sebagai penanda (flag) 
-                // supaya pangkalan data tidak ralat, dan filter KetuaSemakanController tetap berfungsi.
+                // TANGKAP DATA NCR & OFI (Jumlah dan Butiran)
+                $item->ncr_count = $request->ncr_count[$item->id] ?? 0;
+                $item->ofi_count = $request->ofi_count[$item->id] ?? 0;
+
+                // Memandangkan butiran datang dalam bentuk array dari dynamic textareas,
+                // kita gunakan json_encode untuk menyimpannya sebagai String ke dalam DB.
+                $ncrDetails = $request->ncr_details[$item->id] ?? [];
+                $ofiDetails = $request->ofi_details[$item->id] ?? [];
+                
+                $item->ncr_details = !empty($ncrDetails) ? json_encode($ncrDetails) : null;
+                $item->ofi_details = !empty($ofiDetails) ? json_encode($ofiDetails) : null;
+
+                // Penanda untuk KetuaSemakanController
                 $item->respon = 'Ya'; 
                 
             } else {
-                // Jika kotak nyah-tanda (unticked), kosongkan datanya
+                // Jika kotak nyah-tanda (unticked), kosongkan semua data
                 $item->ulasan = null;
                 $item->rujukan = null;
                 $item->respon = null;
+                $item->ncr_count = 0;
+                $item->ofi_count = 0;
+                $item->ncr_details = null;
+                $item->ofi_details = null;
             }
             $item->save();
         }

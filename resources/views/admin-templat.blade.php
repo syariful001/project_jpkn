@@ -78,7 +78,7 @@
 
                         <div class="flex justify-end mt-4">
                             <button type="submit" class="px-4 py-2 bg-[#003366] text-white rounded-md font-bold text-xs uppercase tracking-widest hover:bg-blue-900 shadow-md transition">
-                                + Simpan Ke Pangkalan Data
+                                + Simpan 
                             </button>
                         </div>
                     </form>

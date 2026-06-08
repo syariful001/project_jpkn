@@ -127,7 +127,7 @@
                                                 {{ \Carbon\Carbon::parse($sesi->tarikh_mula)->format('d/m/Y') }} - {{ \Carbon\Carbon::parse($sesi->tarikh_tamat)->format('d/m/Y') }}
                                             </td>
                                             <td class="px-6 py-4">
-                                                <span class="px-2 py-1 text-[12px] font-bold uppercase rounded-full {{ $sesi->status == 'selesai' ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800' }}">
+                                                <span class="px-3 py-2 text-[12px] font-bold uppercase rounded-full {{ $sesi->status == 'selesai' ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800' }}">
                                                     {{ str_replace('_', ' ', $sesi->status) }}
                                                 </span>
                                             </td>
@@ -163,7 +163,7 @@
                                             <th class="px-6 py-3 text-left text-xs font-bold text-gray-500 uppercase">Tarikh</th>
                                             <th class="px-6 py-3 text-left text-xs font-bold text-gray-500 uppercase">Tajuk Sesi</th>
                                             <th class="px-6 py-3 text-left text-xs font-bold text-gray-500 uppercase">Juruaudit / Auditee</th>
-                                            <th class="px-6 py-3 text-left text-xs font-bold text-gray-500 uppercase">Lokasi</th>
+                                            <th class="px-3 py-3 text-left text-xs font-bold text-gray-500 uppercase">Lokasi</th>
                                             <th class="px-6 py-3 text-left text-xs font-bold text-gray-500 uppercase">Status</th>
                                             <th class="px-6 py-3 text-right text-xs font-bold text-gray-500 uppercase">Tindakan</th>
                                         </tr>
@@ -179,11 +179,15 @@
 
                                             <td class="px-6 py-4 text-sm text-gray-900">
                                                 <span class="font-bold block">{{ $borang->namaJuruaudit->name ?? 'Tiada Nama' }}</span>
-                                                <span class="text-[12px] text-gray-500 block">Kpd: {{ $borang->nama_auditee ?? '-' }}</span>
+                                                <span class="text-[10px] text-gray-500 block uppercase">Kepada: {{ $borang->nama_auditee ?? '-' }}</span>
                                             </td>
-                                            <td class="px-6 py-4 text-sm font-semibold text-gray-700">{{ $borang->bahagian_cawangan }}</td>
-                                            <td class="px-6 py-4">
-                                                <span class="px-2 py-1 text-[12px] font-bold uppercase rounded-full {{ $borang->status == 'selesai' ? 'bg-green-100 text-green-800' : 'bg-blue-100 text-blue-800' }}">
+                                            <td class="px-3 py-4 text-sm font-semibold text-gray-700">{{ $borang->bahagian_cawangan }}</td>
+                                            <td class="px-3 py-4">
+                                                <span class="text-[12px] uppercase font-bold px-2 py-1 mt-3 inline-block rounded shadow-sm
+                                                    {{ $borang->status == 'ditugaskan' ? 'bg-red-100 text-red-700 border border-red-200' : 
+                                                      ($borang->status == 'sedang_diisi' ? 'bg-yellow-100 text-yellow-700 border border-yellow-200' : 
+                                                      ($borang->status == 'siap_disemak' ? 'bg-blue-100 text-blue-700 border border-blue-200' : 
+                                                      'bg-green-100 text-green-700 border border-green-200')) }}">
                                                     {{ str_replace('_', ' ', $borang->status) }}
                                                 </span>
                                             </td>
@@ -210,19 +214,37 @@
                 </div> </div> </div>
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             const dataStatusRaw = @json($dataStatus);
             const dataLokasiRaw = @json($dataLokasi);
 
-            const statusLabels = Object.keys(dataStatusRaw).map(label => label.replace('_', ' ').toUpperCase());
+            // PEMETAAN WARNA CARTA PIE STATUS
+            const statusLabelsRaw = Object.keys(dataStatusRaw);
+            const statusLabels = statusLabelsRaw.map(label => label.replace('_', ' ').toUpperCase());
             const statusData = Object.values(dataStatusRaw);
+            
+            // Padankan warna mengikut susunan status sebenar
+            const warnaStatus = statusLabelsRaw.map(status => {
+                if(status === 'ditugaskan') return '#EF4444'; // Merah
+                if(status === 'sedang_diisi') return '#EAB308'; // Kuning
+                if(status === 'siap_disemak') return '#3B82F6'; // Biru
+                if(status === 'selesai') return '#22C55E'; // Hijau
+                return '#9CA3AF'; // Kelabu jika status lain wujud
+            });
             
             if(statusData.length > 0) {
                 new Chart(document.getElementById('cartaStatus'), {
                     type: 'doughnut',
-                    data: { labels: statusLabels, datasets: [{ data: statusData, backgroundColor: ['#EF4444', '#0bf555', '#3B82F6', '#efe814'], borderWidth: 1 }] },
+                    data: { 
+                        labels: statusLabels, 
+                        datasets: [{ 
+                            data: statusData, 
+                            backgroundColor: warnaStatus, 
+                            borderWidth: 1 
+                        }] 
+                    },
                     options: { responsive: true, maintainAspectRatio: false }
                 });
             }
@@ -233,7 +255,7 @@
             if(lokasiData.length > 0) {
                 new Chart(document.getElementById('cartaLokasi'), {
                     type: 'bar',
-                    data: { labels: lokasiLabels, datasets: [{ label: 'Jumlah Borang Diaudit', data: lokasiData, backgroundColor: '#2a8ae9', borderRadius: 4 }] },
+                    data: { labels: lokasiLabels, datasets: [{ label: 'Jumlah Borang Diaudit', data: lokasiData, backgroundColor: ['#EF4444', '#0bf555', '#3B82F6', '#efe814'], borderRadius: 4 }] },
                     options: { responsive: true, maintainAspectRatio: false, scales: { y: { beginAtZero: true, ticks: { stepSize: 1 } } }, plugins: { legend: { display: false } } }
                 });
             }

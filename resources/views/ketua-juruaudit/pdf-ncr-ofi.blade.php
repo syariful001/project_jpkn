@@ -2,7 +2,7 @@
 <html>
 <head>
     <meta charset="utf-8">
-    <title>Laporan Audit JTDI</title>
+    <title>Laporan NCR/OFI Audit JTDI</title>
     <style>
         /* Tetapan Kertas Kepada Landscape */
         @page {
@@ -48,6 +48,7 @@
         table.main-table {
             width: 100%;
             border-collapse: collapse;
+            margin-bottom: 15px;
         }
         table.main-table th, table.main-table td {
             border: 1px solid #000;
@@ -59,6 +60,7 @@
             font-size: 12px;
             text-transform: uppercase;
             font-weight: bold;
+            background-color: #f2f2f2;
         }
         
         /* Gaya Teks Dalam Jadual */
@@ -71,10 +73,9 @@
             font-size: 12px;
             text-transform: uppercase;
         }
-        .num-bullet {
-            font-weight: bold;
-            margin-right: 4px;
-        }
+        
+        ul { margin-top: 0; margin-bottom: 0; padding-left: 15px; text-align: justify; }
+        li { margin-bottom: 4px; }
     </style>
 </head>
 <body>
@@ -84,24 +85,24 @@
     <table class="header-table">
         <tr>
             <td width="20%">
-                <!-- Jika logo tidak keluar, pastikan public_path berfungsi atau gunakan base64 -->
                 <img src="{{ public_path('images/logo.png') }}" class="logo" alt="Logo JPKN">
             </td>
             <td width="60%" class="title-center">
-                SENARAI SEMAK AUDIT DALAMAN<br>
+                LAPORAN PENEMUAN KETIDAKPATUHAN (NCR) & PENAMBAHBAIKAN (OFI)<br>
                 JABATAN TEKNOLOGI DIGITAL DAN INOVASI NEGERI SABAH
             </td>
             <td width="20%"></td>
         </tr>
     </table>
 
+    <!-- Jadual Maklumat -->
     <table class="main-table">
         <tr>
-            <td colspan="3">
+            <td colspan="2" width="60%">
                 <span class="label-text">JURUAUDIT:</span><br>
-                <span class="data-text">{{ $borang->namaJuruaudit->name ?? '' }}</span>
+                <span class="data-text">{{ $borang->juruauditDitugaskan->name ?? ($borang->namaJuruaudit->name ?? '') }}</span>
             </td>
-            <td colspan="1">
+            <td colspan="2" width="40%">
                 <span class="label-text">TARIKH:</span><br>
                 <span class="data-text">{{ \Carbon\Carbon::parse($borang->updated_at)->format('d/m/Y') }}</span>
             </td>
@@ -118,60 +119,64 @@
                 <span class="data-text">{{ $borang->nama_auditee ?? 'TIDAK DINYATAKAN' }}</span>
             </td>
         </tr>
-
-        <!-- KEDUDUKAN HEADERS DIUBAH (RUJUKAN KINI DI TENGAH) -->
         <tr>
-            <th width="5%">KLAUSA</th>
-            <th width="35%">PERKARA-PERKARA UNTUK DIPERIKSA</th>
-            <th width="15%">RUJUKAN</th>
-            <th width="45%">RESPON/ BUKTI/ PENEMUAN/ ULASAN</th>
+            <td colspan="2" style="text-align: center; color: #000;">
+                <span class="label-text">JUMLAH KESELURUHAN NCR: </span> <span style="font-size: 16px; font-weight: bold;">{{ $totalNcr }}</span>
+            </td>
+            <td colspan="2" style="text-align: center; color: #000;">
+                <span class="label-text">JUMLAH KESELURUHAN OFI: </span> <span style="font-size: 16px; font-weight: bold;">{{ $totalOfi }}</span>
+            </td>
+        </tr>
+    </table>
+
+    <!-- Jadual Senarai Penemuan -->
+    <table class="main-table">
+        <tr>
+            <th width="10%">KLAUSA</th>
+            <th width="45%">KETIDAKPATUHAN (NCR)</th>
+            <th width="45%">PENAMBAHBAIKAN (OFI)</th>
         </tr>
 
         @forelse($senaraiItem as $item)
             @php
-                // Pisahkan data yang disambung menggunakan baris baru (\n)
-                $rawPerkara = trim($item->perkara_periksa ?? '');
-                $rawUlasan = trim($item->ulasan ?? '');
-                
-                $arrPerkara = $rawPerkara !== '' ? explode("\n", $rawPerkara) : [];
-                $arrUlasan = $rawUlasan !== '' ? explode("\n", $rawUlasan) : [];
-                
-                // Cari jumlah baris terbanyak antara Perkara atau Ulasan
-                $count = max(count($arrPerkara), count($arrUlasan), 1);
+                $ncrArr = json_decode($item->ncr_details, true) ?? [];
+                $ofiArr = json_decode($item->ofi_details, true) ?? [];
             @endphp
-
-            @for ($i = 0; $i < $count; $i++)
-                @php
-                    // Tetapkan "-" jika baris tersebut kosong
-                    $valP = isset($arrPerkara[$i]) && trim($arrPerkara[$i]) !== '' ? trim($arrPerkara[$i]) : '-';
-                    $valU = isset($arrUlasan[$i]) && trim($arrUlasan[$i]) !== '' ? trim($arrUlasan[$i]) : '-';
-                @endphp
-                <tr>
-                    @if ($i === 0)
-                        <td style="text-align: center; vertical-align: middle;" rowspan="{{ $count }}">{{ $item->no_klausa }}</td>
+            <tr>
+                <td style="text-align: center; vertical-align: top;">
+                    <strong>{{ $item->no_klausa }}</strong><br>
+                </td>
+                
+                <td style="text-align: justify; vertical-align: top;">
+                    @if(count($ncrArr) > 0)
+                        <ul>
+                            @foreach($ncrArr as $ncr)
+                                <li>{{ $ncr }}</li>
+                            @endforeach
+                        </ul>
+                    @else
+                        <div style="text-align: center; font-style: italic; color: #777;">- Tiada NCR -</div>
                     @endif
-                    
-                    <td style="text-align: justify;">
-                        @if($count > 1)<span class="num-bullet">{{ $i + 1 }}.</span>@endif {{ $valP }}
-                    </td>
-                    
-                    <!-- KEDUDUKAN RUJUKAN DIPINDAH KE TENGAH -->
-                    @if ($i === 0)
-                        <td style="text-align: center; vertical-align: middle;" rowspan="{{ $count }}">{{ $item->rujukan ?? '-' }}</td>
+                </td>
+                
+                <td style="text-align: justify; vertical-align: top;">
+                    @if(count($ofiArr) > 0)
+                        <ul>
+                            @foreach($ofiArr as $ofi)
+                                <li>{{ $ofi }}</li>
+                            @endforeach
+                        </ul>
+                    @else
+                        <div style="text-align: center; font-style: italic; color: #777;">- Tiada OFI -</div>
                     @endif
-                    
-                    <!-- KEDUDUKAN ULASAN DIPINDAH KE KANAN SEKALI -->
-                    <td style="text-align: justify;">
-                        @if($count > 1)<span class="num-bullet">{{ $i + 1 }}.</span>@endif {{ $valU }}
-                    </td>
-                </tr>
-            @endfor
+                </td>
+            </tr>
         @empty
-        <tr>
-            <td colspan="4" style="text-align: center; padding: 20px; font-style: italic;">
-                Tiada rekod penemuan bagi sesi ini.
-            </td>
-        </tr>
+            <tr>
+                <td colspan="4" style="text-align: center; padding: 20px; font-style: italic;">
+                    Tiada sebarang rekod penemuan NCR atau OFI bagi sesi ini.
+                </td>
+            </tr>
         @endforelse
     </table>
 

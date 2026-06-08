@@ -85,7 +85,10 @@ Route::middleware('auth')->group(function () {
     Route::post('/ketua/sesi/simpan', [SesiAuditController::class, 'store'])->name('ketua.sesi.store');
     Route::get('/ketua/semakan/{id}', [KetuaSemakanController::class, 'show'])->name('ketua.semakan.show');
     Route::post('/ketua/semakan/{id}', [KetuaSemakanController::class, 'update'])->name('ketua.semakan.update');
+    Route::get('/ketua/semakan/{borang_id}/item/{item_id}/edit', [KetuaSemakanController::class, 'editNcrOfi'])->name('ketua.semakan.edit_ncr_ofi');
+    Route::put('/ketua/semakan/{borang_id}/item/{item_id}/update', [KetuaSemakanController::class, 'updateNcrOfi'])->name('ketua.semakan.update_ncr_ofi');
     Route::get('/ketua/semakan/{id}/pdf', [KetuaSemakanController::class, 'cetakPdf'])->name('ketua.semakan.pdf');
+    Route::get('/ketua/semakan/{id}/pdf-ncr-ofi', [KetuaSemakanController::class, 'cetakPdfNcrOfi'])->name('ketua.semakan.pdf_ncr_ofi');
 });
 
 require __DIR__.'/auth.php';
